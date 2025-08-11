@@ -7,13 +7,12 @@ import debounce from 'lodash.debounce';
 import NoteList from '@/components/NoteList/NoteList';
 import SearchBox from '@/components/SearchBox/SearchBox';
 import Pagination from '@/components/Pagination/Pagination';
-import NoteForm from '@/components/NoteForm/NoteForm';
-import Modal from '@/components/Modal/Modal';
 
 import { fetchNotes } from '@/lib/api';
 import { FetchNotesResponse } from '@/types/FetchNotesResponse';
 
-import styles from './Notes.client.module.css';
+import css from './Notes.client.module.css';
+import Link from 'next/link';
 
 interface NotesClientProps {
   initialData: FetchNotesResponse;
@@ -22,7 +21,6 @@ interface NotesClientProps {
 
 export default function NotesClient({ initialData, searchTag }: NotesClientProps) {
   const [page, setPage] = useState(1);
-  const [showModal, setShowModal] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
@@ -51,11 +49,11 @@ export default function NotesClient({ initialData, searchTag }: NotesClientProps
   const handlePageChange = (newPage: number) => setPage(newPage);
 
   return (
-    <div className={styles.app}>
-      <div className={styles.toolbar}>
-        <button className={styles.button} onClick={() => setShowModal(true)}>
-          + New Note
-        </button>
+    <div className={css.app}>
+      <div className={css.toolbar}>
+        <Link href="/notes/action/create" className={css.button}>
+          + Create note
+        </Link>
         <SearchBox onSearchChange={handleSearchChange} />
         {data?.totalPages != undefined && data.totalPages > 1 && (
           <Pagination currentPage={page} totalPages={data.totalPages} onPageChange={handlePageChange} />
@@ -67,12 +65,6 @@ export default function NotesClient({ initialData, searchTag }: NotesClientProps
 
       {data && data.notes.length > 0 && <NoteList notes={data.notes} />}
       {data && data.notes.length === 0 && <p>No notes found.</p>}
-
-      {showModal && (
-        <Modal onClose={() => setShowModal(false)}>
-          <NoteForm onClose={() => setShowModal(false)} />
-        </Modal>
-      )}
     </div>
   );
 }
